@@ -36,7 +36,7 @@ my $rs = Irssi::server_find_tag($root_server);
 #print Dumper($rs);
 
 my %commands = (
-    $bot_name => ['!goog', '!weather', '!fullweather']
+    $bot_name => ['!goog', '!weather', '!fullweather', '!git']
     );
 
 sub check_if_command {
@@ -61,6 +61,9 @@ sub check_if_command {
                     elsif ($command eq '!fullweather') {
                         #printf "the command is: " . $clean_msg;
                         fullweather(lc $clean_msg);
+                    }
+                    elsif ($command eq '!git') {
+                        gitme(lc $clean_msg)
                     }
 
                 } 
@@ -124,6 +127,9 @@ sub goog {
 
 }
 
+sub gitme {
+  public_msg('I live at -> https://github.com/jmbjr/robotato.git') 
+}
 
 sub weather {
    my ($query) = shift;
