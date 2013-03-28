@@ -63,7 +63,7 @@ sub check_if_command {
                         fullweather(lc $clean_msg);
                     }
                     elsif ($command eq '!git') {
-                        gitme(lc $clean_msg)
+                        gitme(lc $clean_msg);
                     }
 
                 } 
@@ -128,7 +128,7 @@ sub goog {
 }
 
 sub gitme {
-  public_msg('I live at -> https://github.com/jmbjr/robotato.git') 
+  public_msg('I live at -> https://github.com/jmbjr/robotato.git');
 }
 
 sub weather {
