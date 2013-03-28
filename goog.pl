@@ -24,11 +24,11 @@ $VERSION = '1.00';
 
 print CLIENTCRAP "loading goog.pl $VERSION!";
 
-my $root_server = "lunarnet";
+my $root_server = "<server>";
 my $bot_name = "robotato";
-my $root_chan = "#mefightclub";
-my $target_server = "lunarnet";
-my @target_chan = qw(#mefightclub);
+my $root_chan = "<room>";
+my $target_server = "<server>";
+my @target_chan = qw(<room>);
 my $ts = Irssi::server_find_tag($target_server);
 my $rs = Irssi::server_find_tag($root_server);
 
