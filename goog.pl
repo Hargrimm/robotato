@@ -128,7 +128,7 @@ sub goog {
 }
 
 sub gitme {
-  public_msg('I live at -> https://github.com/jmbjr/robotato.git');
+  public_msg($target_chan[0], "I live at -> https://github.com/jmbjr/robotato.git");
 }
 
 sub weather {
