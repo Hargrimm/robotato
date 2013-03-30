@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Weather::Underground;
-require 'robotato.pl';
 
 sub weather {
    my ($query, $target_chan) = shift;
@@ -104,3 +103,5 @@ sub wf {
 
    return 
 }
+1;
+

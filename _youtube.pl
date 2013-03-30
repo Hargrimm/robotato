@@ -5,7 +5,6 @@ use warnings;
 use Data::Dumper;
 use WWW::Mechanize;
 use URI::Find::Schemeless;
-require 'robotato.pl';
 
 sub scrapeYT {
     my ($msg,  $target_chan) = @_;
@@ -48,3 +47,4 @@ sub checkYT {
         return 0;
     }
 }
+1;

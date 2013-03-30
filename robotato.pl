@@ -6,14 +6,12 @@ use Irssi;
 use warnings;
 use vars qw($VERSION %IRSSI);
 use Data::Dumper;
-use WWW::Mechanize;
-use URI::Find::Schemeless;
-use LWP::Simple;
-use LWP::UserAgent;
-use Weather::Underground;
-require '_goog.pl';
-require '_weather.pl';
-require '_irssi.pl';
+our $robodir = "/home/johnstein/.irssi/scripts/";
+
+require $robodir . '_weather.pl';
+require $robodir . '_git.pl';
+require $robodir . '_youtube.pl';
+require $robodir . '_googme.pl';
 
 $VERSION = '2.00';
 %IRSSI = (
@@ -24,7 +22,13 @@ $VERSION = '2.00';
     license     => 'Public Domain',
 );
 
-print CLIENTCRAP "loading goog.pl $VERSION!";
+print CLIENTCRAP "loading ROBOTATO $VERSION!";
+
+Irssi::settings_add_str("targetserver", "target_server", "");
+Irssi::settings_add_str("rootchan", "root_chan", "");
+Irssi::settings_add_str("rootserver", "root_server", "");
+Irssi::settings_add_str("crawlwatch", "crawlwatchnicks", "");
+Irssi::settings_add_str("targetchan", "target_chan", "");
 
 #if info.txt exists in the same directory as goog.pl, get server, bot, and room info from that
 #line 1 = server
@@ -33,11 +37,11 @@ print CLIENTCRAP "loading goog.pl $VERSION!";
 
 #otherwise, you will need to hardcode these explicitly below
 
-my $root_server;
-my $bot_name;
-my $root_chan;
-my $target_server;
-my $infofile = "/home/johnstein/.irssi/scripts/info.txt";
+our $root_server;
+our $bot_name;
+our $root_chan;
+our $target_server;
+our $infofile = $robodir . "info.txt";
 
 if (-e $infofile) {
   #read file and set variables
@@ -58,7 +62,7 @@ if (-e $infofile) {
 
   $root_server = $thearray[0];
   $bot_name = $thearray[1];
-  $root_chan = $thearray[2]; 
+  $root_chan = $thearray[2];
   $target_server = $thearray[0];
 }
 else {
@@ -69,8 +73,14 @@ else {
   $target_server = "<server>";  
 }
 
-my @target_chan;
+our (@target_chan, $target_chan);
 push @target_chan, $root_chan;
+
+#stupid hack to ensure the dispatch function below knows what channel and server we are on
+Irssi::settings_set_str("root_server", $root_server);
+Irssi::settings_set_str("root_chan", $root_chan);
+Irssi::settings_set_str("target_server", $target_server);
+Irssi::settings_set_str("target_chan", $target_chan[0]);
 
 my $ts = Irssi::server_find_tag($target_server);
 my $rs = Irssi::server_find_tag($root_server);
@@ -109,7 +119,7 @@ sub check_if_command {
                 } 
                 else {
 
-		                private_msg($bot, $command . ' ' . $clean_msg);
+		        private_msg($bot, $command . ' ' . $clean_msg);
                 }
             }
         }
@@ -151,9 +161,17 @@ sub private_msg {
 
 sub dispatch {
     my ($server, $msg, $nick, $mask, $chan) = @_;
+    $target_server = Irssi::settings_get_str("target_server");
+    $root_chan = Irssi::settings_get_str("root_chan");
+    $root_server = Irssi::settings_get_str("root_server");
+    $target_chan = Irssi::settings_get_str("target_chan");
 
-    if (lc($chan) eq lc($target_chan[0])) {
-        if ( checkYT(trim($msg), $target_chan[0]) ) {
+    printf $root_chan;
+    printf $root_chan;
+    printf $target_server;
+
+    if (lc($chan) eq lc($target_chan)) {
+        if ( checkYT(trim($msg), $target_chan) ) {
             scrapeYT($msg);
         }
         else {
@@ -181,3 +199,10 @@ sub priv_dispatch {
 }
 Irssi::signal_add("message public", "dispatch");
 Irssi::signal_add("message private", "priv_dispatch");
+#Irssi::settings_add_str("targetchan", "target_chan", "");
+#Irssi::settings_add_str("rootchan", "root_chan", "");
+#Irssi::settings_add_str("targetserver", "target_server", "");
+#Irssi::settings_add_str("crawlwatch", "crawlwatchnicks", "");
+
+
+
