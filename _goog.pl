@@ -5,7 +5,7 @@ use warnings;
 use Data::Dumper;
 use LWP::Simple;
 use LWP::UserAgent;
-use _irssi;
+require '_irssi.pl';
 
 sub goog {
    my ($query) = @_; 

@@ -11,10 +11,10 @@ use URI::Find::Schemeless;
 use LWP::Simple;
 use LWP::UserAgent;
 use Weather::Underground;
-use _goog;
-use _weather;
-use _youtube;
-use _irssi;
+require '_goog.pl';
+require '_weather.pl';
+require '_youtube.pl';
+require '_irssi.pl';
 
 $VERSION = '2.00';
 %IRSSI = (

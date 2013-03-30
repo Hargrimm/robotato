@@ -5,7 +5,7 @@ use strict;
 use Irssi;
 use warnings;
 use vars qw($VERSION %IRSSI);
-use _youtube;
+require '_youtube.pl';
 
 
 sub process_msg {

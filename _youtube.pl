@@ -5,7 +5,7 @@ use warnings;
 use Data::Dumper;
 use WWW::Mechanize;
 use URI::Find::Schemeless;
-use _irssi;
+require '_irssi.pl';
 
 sub scrapeYT {
     my $msg = shift;

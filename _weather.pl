@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Weather::Underground;
-use _irssi;
+require '_irssi.pl';
 
 sub weather {
    my ($query) = shift;
