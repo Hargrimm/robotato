@@ -4,22 +4,22 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Weather::Underground;
-require '_irssi.pl';
+require 'robotato.pl';
 
 sub weather {
-   my ($query) = shift;
-   wf($query, 0);
+   my ($query, $target_chan) = shift;
+   wf($query, 0, $target_chan);
 }
 
 sub fullweather {
-  my ($query) = shift;
-   wf($query, 1);
+  my ($query, $target_chan) = shift;
+   wf($query, 1, $target_chan);
 }
 
 sub wf {
-   my ($query) = @_;
-   my ($full) = shift;
-   $full = shift;
+   my ($query, $full, $target_chan) = @_;
+   #my ($full) = shift;
+   #$full = shift;
    printf "FULL?? " . $full;
    $query = join " ", split " ", $query;
    my ($fail) = 0;
@@ -92,13 +92,13 @@ sub wf {
    printf $line3;
 
    if ($fail) { 
-      public_msg($target_chan[0], "Bad Location: " . $query);
+      public_msg($target_chan, "Bad Location: " . $query);
    }
    else {
-      public_msg($target_chan[0], $line1);
+      public_msg($target_chan, $line1);
       if ($full) {
-         public_msg($target_chan[0], $line2);
-         public_msg($target_chan[0], $line3);
+         public_msg($target_chan, $line2);
+         public_msg($target_chan, $line3);
       }
    }
 

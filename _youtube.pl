@@ -5,10 +5,10 @@ use warnings;
 use Data::Dumper;
 use WWW::Mechanize;
 use URI::Find::Schemeless;
-require '_irssi.pl';
+require 'robotato.pl';
 
 sub scrapeYT {
-    my $msg = shift;
+    my ($msg,  $target_chan) = @_;
     my @uris;
     my $finder = URI::Find::Schemeless->new(sub {
         my $uri = shift;
@@ -25,11 +25,11 @@ sub scrapeYT {
         my $title = $mech->title();
         $title =~ s/- YouTube$//;
         printf "%s\n", $title;
-        public_msg($target_chan[0], "YouTube: " . $title);
+        public_msg($target_chan, "YouTube: " . $title);
     }
     else {
         printf "BAD YOUTUBE LINK!";
-        public_msg($target_chan[0], "CONFUSING YOUTUBE URL!! :C :C");
+        public_msg($target_chan, "CONFUSING YOUTUBE URL!! :C :C");
     }
 }
 

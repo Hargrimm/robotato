@@ -5,10 +5,10 @@ use warnings;
 use Data::Dumper;
 use LWP::Simple;
 use LWP::UserAgent;
-require '_irssi.pl';
+require 'robotato.pl';
 
 sub goog {
-   my ($query) = @_; 
+   my ($query, $target_chan) = @_; 
    $query = join "+", split " ", $query;
    my ($theURI) = "http://www.google.com/search?q=" . lc($query) . "&btnI";
 
