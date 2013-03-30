@@ -13,7 +13,7 @@ use LWP::UserAgent;
 use Weather::Underground;
 
 
-$VERSION = '1.00';
+$VERSION = '2.00';
 %IRSSI = (
     authors     => 'Jared Tyler Miller, John Boyle',
     contact     => 'jtmiller@gmail.com, boylejm@gmail.com',
@@ -35,34 +35,45 @@ my $root_server;
 my $bot_name;
 my $root_chan;
 my $target_server;
-my @target_chan;
-my $infofile = 'info.txt';
+my $infofile = "/home/johnstein/.irssi/scripts/info.txt";
 
 if (-e $infofile) {
   #read file and set variables
   #line 1 = server
   #line 2 = bot name
   #line 3 = room  
-  open my $stuff, '<', $infofile or die();
-  chomp(my @lines = <$stuff>);
-  close $stuff;
+  #NEEDS error checking to ensure the info file has correct format
+  #also needs error checking to verify the strings make sense
+  my @thearray;
+    
+  open (my $fh, "<" . $infofile)
+     or die "FAILED TO OPEN INFO FILE! $!\n";
+  while(<$fh>) {
+    chomp;
+    push @thearray, $_;
+  }
+  close $fh;
 
-  $root_server = $lines[0];
-  $bot_name = $lines[1];
-  $target_chan = $lines[2]; 
-  $target_server = $lines[0];
+  $root_server = $thearray[0];
+  $bot_name = $thearray[1];
+  $root_chan = $thearray[2]; 
+  $target_server = $thearray[0];
 }
 else {
-  my $root_server = "<server>";
-  my $bot_name = "<botname>";
-  my $root_chan = "<room>";
-  my $target_server = "<server>";
-  my @target_chan = qw(<room>);  
+  printf "File: " . $infofile . " does NOT exist!";
+  $root_server = "<server>";
+  $bot_name = "<botname>";
+  $root_chan = "<room>";
+  $target_server = "<server>";  
 }
+
+my @target_chan;
+push @target_chan, $root_chan;
 
 my $ts = Irssi::server_find_tag($target_server);
 my $rs = Irssi::server_find_tag($root_server);
 
+#add new commands here
 my %commands = (
     $bot_name => ['!goog', '!weather', '!fullweather', '!git']
     );
