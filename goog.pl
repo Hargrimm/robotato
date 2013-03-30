@@ -24,16 +24,44 @@ $VERSION = '1.00';
 
 print CLIENTCRAP "loading goog.pl $VERSION!";
 
-my $root_server = "<server>";
-my $bot_name = "robotato";
-my $root_chan = "<room>";
-my $target_server = "<server>";
-my @target_chan = qw(<room>);
+#if info.txt exists in the same directory as goog.pl, get server, bot, and room info from that
+#line 1 = server
+#line 2 = bot name
+#line 3 = room
+
+#otherwise, you will need to hardcode these explicitly below
+
+my $root_server;
+my $bot_name;
+my $root_chan;
+my $target_server;
+my @target_chan;
+my $infofile = 'info.txt';
+
+if (-e $infofile) {
+  #read file and set variables
+  #line 1 = server
+  #line 2 = bot name
+  #line 3 = room  
+  open my $stuff, '<', $infofile or die();
+  chomp(my @lines = <$stuff>);
+  close $stuff;
+
+  $root_server = $lines[0];
+  $bot_name = $lines[1];
+  $target_chan = $lines[2]; 
+  $target_server = $lines[0];
+}
+else {
+  my $root_server = "<server>";
+  my $bot_name = "<botname>";
+  my $root_chan = "<room>";
+  my $target_server = "<server>";
+  my @target_chan = qw(<room>);  
+}
+
 my $ts = Irssi::server_find_tag($target_server);
 my $rs = Irssi::server_find_tag($root_server);
-
-#print Dumper($ts);
-#print Dumper($rs);
 
 my %commands = (
     $bot_name => ['!goog', '!weather', '!fullweather', '!git']
@@ -65,11 +93,10 @@ sub check_if_command {
                     elsif ($command eq '!git') {
                         gitme(lc $clean_msg);
                     }
-
                 } 
                 else {
-                    #print CLIENTCRAP $bot . '-' . $command . ' ' . $clean_msg . "\n";
-		    private_msg($bot, $command . ' ' . $clean_msg);
+
+		                private_msg($bot, $command . ' ' . $clean_msg);
                 }
             }
         }
@@ -79,8 +106,6 @@ sub check_if_command {
 sub goog {
    my ($query) = @_; 
    $query = join "+", split " ", $query;
-   #printf "goog query=" . $query;
-   #my ($theURI) = "http://www.google.com/search?btnI=I%27m+Feeling+Lucky&ie=UTF-8&sourceid=navclient&oe=UTF-8&q=" . lc($query);
    my ($theURI) = "http://www.google.com/search?q=" . lc($query) . "&btnI";
 
    my $ua = new LWP::UserAgent;
@@ -96,34 +121,21 @@ sub goog {
   
    if ($redirectURI eq "") {
       $redirectURI = "Looks like this url wasn't lucky... (" . $response->status_line . ")";
-      #$redirectURI= $response->status_line;
       $unlucky=1;
    }
 
-   #if ($response->is_success) {
-   #   $unlucky=0;
-   #}
-   #else {
-   #   $unlucky = 1;
-   #   $redirectURI= $response->status_line;
-   #}
-   #$redirectURI = $theURI;
    printf "|" . $redirectURI . "|";
    if ($unlucky) {
       public_msg($target_chan[0], "\cc12G\cc4o\cc7o\cc12g\cc9l\cc4e \cc0: \co " . $redirectURI  );
       public_msg($target_chan[0], "\cc12G\cc4o\cc7o\cc12g\cc9l\cc4e \cc0: \co " . $theURI  );
-      #public_msg($target_chan[0], "\cc12G\cc4o\cc7o\cc12g\cc9l\cc4e \cc0: \co " . $response->status_line  );
    }
    else {
       public_msg($target_chan[0], "\cc12G\cc4o\cc7o\cc12g\cc9l\cc4e \cc0: \co " . $redirectURI  );
-      #public_msg($target_chan[0], "\cc12G\cc4o\cc7o\cc12g\cc9l\cc4e \cc0: \co " . $theURI  );
-      #public_msg($target_chan[0], "\cc12G\cc4o\cc7o\cc12g\cc9l\cc4e \cc0: \co " . $response->status_line  );
    }
 
    if ( checkYT(trim($redirectURI)) ) {
        scrapeYT($redirectURI);
    }
-
 
 }
 
@@ -141,14 +153,12 @@ sub fullweather {
    wf($query, 1);
 }
 
-
 sub wf {
    my ($query) = @_;
    my ($full) = shift;
    $full = shift;
    printf "FULL?? " . $full;
    $query = join " ", split " ", $query;
-   #printf "wf query=" . $query;
    my ($fail) = 0;
 
    my $weather = Weather::Underground->new(
@@ -230,7 +240,6 @@ sub wf {
    }
 
    return 
-   #printf "wf working!";
 }
 
 
@@ -289,8 +298,6 @@ sub scrapeYT {
         my $title = $mech->title();
         $title =~ s/- YouTube$//;
         printf "%s\n", $title;
-        #public_msg($target_chan[0], "LET ME SCRAPE THAT FOR YOU!!!");
-        #public_msg($target_chan[0], "\cc1,0You\cc0\,5Tube\co: " . $title);
         public_msg($target_chan[0], "YouTube: " . $title);
     }
     else {
@@ -324,10 +331,9 @@ sub checkYT {
 
 sub dispatch {
     my ($server, $msg, $nick, $mask, $chan) = @_;
-    #printf "DISPATCH: " . $nick . "/" . $msg;
+
     if (lc($chan) eq lc($target_chan[0])) {
         if ( checkYT(trim($msg)) ) {
-	    #testscrape();
             scrapeYT($msg);
         }
         else {
@@ -341,7 +347,6 @@ sub dispatch {
         # return unless the $player is found in the $text
         return unless (grep {lc($msg) =~ lc($_)} split(/ +/, Irssi::settings_get_str("crawlwatchnicks")));
         # send command if $text contains any @player names
-        # public_msg($target_chan, $msg)
         foreach (@target_chan) {
             public_msg($_, $msg)
         }
@@ -359,5 +364,3 @@ Irssi::signal_add("message public", "dispatch");
 Irssi::signal_add("message private", "priv_dispatch");
 Irssi::settings_add_str("crawlwatch", "crawlwatchnicks", "");
 
-#print CLIENTCRAP "/set crawlwatchnicks ed edd eddy ...";
-print CLIENTCRAP "Watched nicks: " . Irssi::settings_get_str("crawlwatchnicks");
